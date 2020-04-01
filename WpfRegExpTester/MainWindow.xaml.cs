@@ -34,7 +34,7 @@ namespace WpfRegExpTester
 
             rtb.SetText(inputTxt.Text);
             IEnumerable<TextRange> wordRanges = null;
-            wordRanges = GetAllWordRangesEnh(rtb.Document, patternTxt.Text);
+            wordRanges = GetAllWordRanges(rtb.Document, patternTxt.Text);
 
             foreach (TextRange wordRange in wordRanges)
             {
@@ -47,7 +47,7 @@ namespace WpfRegExpTester
                     }
                     else
                     {
-                        wordRange.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Red);
+                        wordRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Red);
                     }
                 }
 
@@ -82,50 +82,6 @@ namespace WpfRegExpTester
             }
         }
 
-        public  IEnumerable<TextRange> GetAllWordRangesEnh(FlowDocument document, string pattern)
-        {
-            TextPointer pointer = document.ContentStart;
-            while (pointer != null)
-            {
-                if (pointer.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-                {
-                    MatchCollection matches = null;
-                    string textRun = pointer.GetTextInRun(LogicalDirection.Forward);
-                    try
-                    {
-                        matches = Regex.Matches(textRun, pattern);
-                    }
-                    catch (Exception ex)
-                    {
-                        logTxt.Items.Add(ex.Message);
-                        yield break;
-                    }
-                    
-
-                    for (int i = 0; i < matches.Count; i++)
-                    {
-                        int startIndex = matches[i].Index;
-                        int length = 1;
-
-                        do
-                        {
-                            i++;
-                            length++;
-                            if (i + 1 >= matches.Count)
-                            {
-                                break;
-                            }
-                        }
-                        while (matches[i].Index + 1 == matches[i + 1].Index);
-                        TextPointer start = pointer.GetPositionAtOffset(startIndex);
-                        TextPointer end = start.GetPositionAtOffset(length);
-                        yield return new TextRange(start, end);
-                    }
-                }
-
-                pointer = pointer.GetNextContextPosition(LogicalDirection.Forward);
-            }
-        }
     }
 
 
